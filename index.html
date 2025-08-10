@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>견적서 편집기</title>
+    <link rel="stylesheet" href="style.css?v=6">
+</head>
+<body>
+    <div class="container">
+        <div id="quote-editor">
+            <!-- 견적서 편집기가 여기에 동적으로 생성됩니다. -->
+        </div>
+        <div class="actions">
+            <button id="save-button">JSON으로 저장</button>
+        </div>
+        <div id="output-container" style="display:none;">
+            <h3>업데이트된 JSON 데이터:</h3>
+            <a id="download-link" style="display:none;">quote.json 다운로드</a>
+            <pre id="json-output"></pre>
+        </div>
+    </div>
+    <script src="script.js?v=6"></script>
+</body>
+</html>

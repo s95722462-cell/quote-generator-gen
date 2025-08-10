@@ -1,0 +1,177 @@
+body {
+    font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 840px;
+    background: #fff;
+    padding: 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+#quote {
+    width: 100%;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+.quote-header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 20px;
+}
+
+.quote-no-date {
+    text-align: right;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.parties {
+    display: flex;
+    justify-content: space-between;
+}
+
+.to-party, .from-party {
+    width: 48%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.to-party h3, .from-party h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.quote-greeting {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.quote-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed; /* Add this line */
+}
+
+.quote-body th, .quote-body td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.quote-body th {
+    background-color: #f2f2f2;
+}
+
+.quote-body tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.quote-body tfoot td {
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
+
+.quote-footer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.terms, .remarks {
+    width: 48%;
+}
+
+.terms h3, .remarks h3 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.quote-address {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 12px;
+    color: #777;
+}
+
+/* Appended styles for editor */
+input[type="text"], textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Important */
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.quote-body td {
+    padding: 5px;
+}
+
+.actions {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#save-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+#output-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #272822;
+    color: #f8f8f2;
+    border-radius: 5px;
+}
+
+#json-output {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#download-link {
+    display: block;
+    margin-bottom: 10px;
+    color: #66d9ef;
+}
+
+.text-center-input {
+    text-align: center !important;
+}
+
+.text-right-input {
+    text-align: right !important;
+}
