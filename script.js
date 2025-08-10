@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let originalData = null;
     const quoteEditor = document.getElementById('quote-editor');
     const saveButton = document.getElementById('save-button');
+    const savePdfButton = document.getElementById('save-pdf-button');
+    const saveJpgButton = document.getElementById('save-jpg-button');
 
     // New helper functions for number formatting and parsing
     function formatNumber(num) {
@@ -129,10 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Footer (Total)
         html += `<tfoot><tr>`;
         html += `<td colspan="3" style="text-align:right; border:none;"></td>`;
-        html += `<td>&nbsp;</td>`; // This was the "합계" input, now empty
-        html += `<td></td>`;
-        html += `<td>${createInput(34, '__7', data[34]['__7'])}</td>`;
-        html += `<td style="border:none;"></td>`;
+        html += `<td>합계금액</td>`; // bottom of "단위" column
+        html += `<td colspan="2">${createInput(34, '__7', data[34]['__7'])}</td>`; // bottom of "금액" column, now spans "단가" and "금액"
+        html += `<td style="border:none;"></td>`; // bottom of "납기" column
         html += `</tr></tfoot></table></div>`;
 
         // Terms and Remarks
