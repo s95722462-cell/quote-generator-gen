@@ -1,15 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const itemTableBody = document.querySelector('#itemTable tbody');
     const addItemBtn = document.getElementById('addItemBtn');
-    const deleteLastItemBtn = document.getElementById('deleteLastItemBtn'); // New button
+    const deleteLastItemBtn = document.getElementById('deleteLastItemBtn');
     const totalAmountSpan = document.getElementById('totalAmount');
     const captureBtn = document.getElementById('captureBtn');
     const quoteFormContainer = document.getElementById('quote-form-container');
 
     let itemCounter = 0;
 
-    // Function to format number with commas
+    // Function to format number with commas, or return empty string if 0
     function formatNumberWithCommas(number) {
+        if (number === 0) {
+            return '';
+        }
         return number.toLocaleString('ko-KR');
     }
 
@@ -19,11 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const newRow = itemTableBody.insertRow();
         newRow.innerHTML = `
             <td>${itemCounter}</td>
-            <td><input type="text" class="form-control item-name"></td>
-            <td><input type="number" class="form-control item-quantity" value="1" min="0"></td>
-            <td><input type="text" class="form-control item-unit-price" value="0"></td>
-            <td class="item-amount">0</td>
-        `; // Removed delete button from here
+            <td><input type="text" class="form-control item-name" placeholder="품명"></td>
+            <td><input type="number" class="form-control item-quantity" value="1" min="0" placeholder="1"></td>
+            <td><input type="text" class="form-control item-unit-price" value=""></td> <!-- Initial value empty for 0 -->
+            <td class="item-amount"></td> <!-- Initial value empty for 0 -->
+        `;
 
         const itemNameInput = newRow.querySelector('.item-name');
         const quantityInput = newRow.querySelector('.item-quantity');
@@ -34,7 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add input event listener for formatting unit price
         unitPriceInput.addEventListener('input', (event) => {
             let value = event.target.value.replace(/[^0-9]/g, ''); // Remove non-digits
-            event.target.value = formatNumberWithCommas(parseInt(value || 0));
+            let numericValue = parseInt(value || 0);
+            event.target.value = formatNumberWithCommas(numericValue);
             calculateRowAmount(newRow);
         });
 
@@ -112,8 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     captureBtn.addEventListener('click', () => {
         // Temporarily hide buttons that shouldn't be in the screenshot
         addItemBtn.style.display = 'none';
-        deleteLastItemBtn.style.display = 'none'; // Hide new delete button
-        // document.querySelectorAll('.delete-item-btn').forEach(btn => btn.style.display = 'none'); // Removed individual delete button hiding
+        deleteLastItemBtn.style.display = 'none';
         captureBtn.style.display = 'none';
 
         html2canvas(quoteFormContainer, {
@@ -122,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).then(canvas => {
             // Re-show buttons
             addItemBtn.style.display = '';
-            deleteLastItemBtn.style.display = ''; // Show new delete button
+            deleteLastItemBtn.style.display = '';
             captureBtn.style.display = '';
 
             const link = document.createElement('a');
