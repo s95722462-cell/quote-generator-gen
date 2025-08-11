@@ -89,7 +89,5 @@ h2 {
         width: 120px;
     }
 
-    .table th:nth-child(6), .table td:nth-child(6) { /* Delete button */
-        width: 60px;
-    }
+    /* Removed the 6th column width as it's no longer there */
 }

@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const itemTableBody = document.querySelector('#itemTable tbody');
     const addItemBtn = document.getElementById('addItemBtn');
+    const deleteLastItemBtn = document.getElementById('deleteLastItemBtn'); // New button
     const totalAmountSpan = document.getElementById('totalAmount');
     const captureBtn = document.getElementById('captureBtn');
     const quoteFormContainer = document.getElementById('quote-form-container');
@@ -20,15 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${itemCounter}</td>
             <td><input type="text" class="form-control item-name"></td>
             <td><input type="number" class="form-control item-quantity" value="1" min="0"></td>
-            <td><input type="text" class="form-control item-unit-price" value="0"></td> <!-- Changed type to text -->
+            <td><input type="text" class="form-control item-unit-price" value="0"></td>
             <td class="item-amount">0</td>
-            <td><button type="button" class="btn btn-danger btn-sm delete-item-btn">삭제</button></td>
-        `;
+        `; // Removed delete button from here
 
         const itemNameInput = newRow.querySelector('.item-name');
         const quantityInput = newRow.querySelector('.item-quantity');
         const unitPriceInput = newRow.querySelector('.item-unit-price');
-        const deleteButton = newRow.querySelector('.delete-item-btn');
 
         quantityInput.addEventListener('input', () => calculateRowAmount(newRow));
         
@@ -61,17 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        deleteButton.addEventListener('click', () => deleteItem(newRow));
-
         updateRowNumbers();
         calculateRowAmount(newRow); // Calculate initial amount for the new row
     }
 
-    // Function to delete an item row
-    function deleteItem(row) {
-        row.remove();
-        updateRowNumbers();
-        calculateTotal();
+    // Function to delete the last item row
+    function deleteLastItem() {
+        if (itemTableBody.children.length > 0) {
+            itemTableBody.lastElementChild.remove();
+            updateRowNumbers();
+            calculateTotal();
+        }
     }
 
     // Function to calculate amount for a single row
@@ -106,11 +105,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for Add Item button
     addItemBtn.addEventListener('click', addItem);
 
+    // Event listener for Delete Last Item button
+    deleteLastItemBtn.addEventListener('click', deleteLastItem);
+
     // Event listener for Capture button
     captureBtn.addEventListener('click', () => {
         // Temporarily hide buttons that shouldn't be in the screenshot
         addItemBtn.style.display = 'none';
-        document.querySelectorAll('.delete-item-btn').forEach(btn => btn.style.display = 'none');
+        deleteLastItemBtn.style.display = 'none'; // Hide new delete button
+        // document.querySelectorAll('.delete-item-btn').forEach(btn => btn.style.display = 'none'); // Removed individual delete button hiding
         captureBtn.style.display = 'none';
 
         html2canvas(quoteFormContainer, {
@@ -119,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).then(canvas => {
             // Re-show buttons
             addItemBtn.style.display = '';
-            document.querySelectorAll('.delete-item-btn').forEach(btn => btn.style.display = '');
+            deleteLastItemBtn.style.display = ''; // Show new delete button
             captureBtn.style.display = '';
 
             const link = document.createElement('a');
