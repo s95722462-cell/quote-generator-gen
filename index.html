@@ -3,27 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>견적서 편집기</title>
-    <link rel="stylesheet" href="style.css?v=6">
+    <title>견적서 생성기</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div id="quote-editor">
-            <!-- 견적서 편집기가 여기에 동적으로 생성됩니다. -->
+    <div class="container mt-5" id="quote-form-container">
+        <h2 class="mb-4 text-center">견적서</h2>
+
+        <!-- Header Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="clientName" class="form-label">고객명</label>
+                        <input type="text" class="form-control" id="clientName">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="clientContactPerson" class="form-label">담당자</label>
+                        <input type="text" class="form-control" id="clientContactPerson">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="clientContactNumber" class="form-label">연락처</label>
+                        <input type="text" class="form-control" id="clientContactNumber">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="supplierName" class="form-label">공급자</label>
+                        <input type="text" class="form-control" id="supplierName">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="supplierContactPerson" class="form-label">담당자</label>
+                        <input type="text" class="form-control" id="supplierContactPerson">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="supplierContactNumber" class="form-label">연락처</label>
+                        <input type="text" class="form-control" id="supplierContactNumber">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label for="notes" class="form-label">비고</label>
+                        <textarea class="form-control" id="notes" rows="3" placeholder="예) 부가세 별도&#10;납기: 발주 후 10일"></textarea>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="actions">
-            <button id="save-button">JSON으로 저장</button>
-            <button id="save-pdf-button">PDF로 저장</button>
-            <button id="save-jpg-button">JPG로 저장</button>
+
+        <!-- Items Table Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">품목</h5>
+                <table class="table table-bordered" id="itemTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">No.</th>
+                            <th>품명</th>
+                            <th style="width: 100px;">수량</th>
+                            <th style="width: 150px;">단가</th>
+                            <th style="width: 150px;">금액</th>
+                            <th style="width: 80px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Item rows will be added here by JavaScript -->
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-primary mb-3" id="addItemBtn">품목 추가</button>
+            </div>
         </div>
-        <div id="output-container" style="display:none;">
-            <h3>업데이트된 JSON 데이터:</h3>
-            <a id="download-link" style="display:none;">quote.json 다운로드</a>
-            <pre id="json-output"></pre>
+
+        <!-- Total Section -->
+        <div class="card mb-4">
+            <div class="card-body text-end">
+                <h4 class="mb-0">총 합계: <span id="totalAmount">0</span> 원</h4>
+            </div>
+        </div>
+
+        <!-- Capture Button -->
+        <div class="text-center mb-5">
+            <button type="button" class="btn btn-success btn-lg" id="captureBtn">견적서 이미지 저장</button>
+        </div>
+
+        <!-- Made by section -->
+        <div class="text-start mt-3 mb-3 text-muted" id="made-by-signature">
+            made by 알프
         </div>
     </div>
-    <!-- html2pdf.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="script.js?v=6"></script>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>

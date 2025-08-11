@@ -1,246 +1,134 @@
-console.log("script.js version 6.0 loaded!");
+document.addEventListener('DOMContentLoaded', () => {
+    const itemTableBody = document.querySelector('#itemTable tbody');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const totalAmountSpan = document.getElementById('totalAmount');
+    const captureBtn = document.getElementById('captureBtn');
+    const quoteFormContainer = document.getElementById('quote-form-container');
 
-document.addEventListener('DOMContentLoaded', function() {
-    let originalData = null;
-    const quoteEditor = document.getElementById('quote-editor');
-    const saveButton = document.getElementById('save-button');
-    const savePdfButton = document.getElementById('save-pdf-button');
-    const saveJpgButton = document.getElementById('save-jpg-button');
+    let itemCounter = 0;
 
-    // New helper functions for number formatting and parsing
-    function formatNumber(num) {
-        // Convert to number first to handle string "0" or 0.0
-        const numericValue = Number(num);
-        if (isNaN(numericValue) || numericValue === null || numericValue === undefined || numericValue === 0) {
-            return '';
-        }
-        return numericValue.toLocaleString('ko-KR');
+    // Function to format number with commas
+    function formatNumberWithCommas(number) {
+        return number.toLocaleString('ko-KR');
     }
 
-    function parseNumber(str) {
-        if (!str) return 0;
-        return parseFloat(String(str).replace(/,/g, '')); // Remove commas before parsing
-    }
+    // Function to add a new item row
+    function addItem() {
+        itemCounter++;
+        const newRow = itemTableBody.insertRow();
+        newRow.innerHTML = `
+            <td>${itemCounter}</td>
+            <td><input type="text" class="form-control item-name"></td>
+            <td><input type="number" class="form-control item-quantity" value="1" min="0"></td>
+            <td><input type="text" class="form-control item-unit-price" value="0"></td> <!-- Changed type to text -->
+            <td class="item-amount">0</td>
+            <td><button type="button" class="btn btn-danger btn-sm delete-item-btn">삭제</button></td>
+        `;
 
-    fetch('quote.json')
-        .then(response => response.json())
-        .then(data => {
-            originalData = data;
-            renderEditor(data);
-            setupCalculations(); // Setup calculations after rendering
-        })
-        .catch(error => {
-            console.error('Error fetching quote data:', error);
-            quoteEditor.innerHTML = '<p style="color:red;">견적서 데이터를 불러오는데 실패했습니다.</p>';
+        const itemNameInput = newRow.querySelector('.item-name');
+        const quantityInput = newRow.querySelector('.item-quantity');
+        const unitPriceInput = newRow.querySelector('.item-unit-price');
+        const deleteButton = newRow.querySelector('.delete-item-btn');
+
+        quantityInput.addEventListener('input', () => calculateRowAmount(newRow));
+        
+        // Add input event listener for formatting unit price
+        unitPriceInput.addEventListener('input', (event) => {
+            let value = event.target.value.replace(/[^0-9]/g, ''); // Remove non-digits
+            event.target.value = formatNumberWithCommas(parseInt(value || 0));
+            calculateRowAmount(newRow);
         });
 
-    function renderEditor(data) {
-        let html = '';
+        // Add keydown event listener for Enter key on unit price input
+        unitPriceInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                const currentRow = event.target.closest('tr');
+                const nextRow = currentRow.nextElementSibling;
 
-        const createInput = (row, key, value, placeholder = '') => {
-            // Ensure value is a string and escape double quotes for HTML attribute
-            const escapedValue = String(value || '').replace(/"/g, '&quot;');
-            let className = ''; // Use className instead of style
-            // Apply center alignment only if it's the 'No.', '수량', or '단위' column AND it's within the item table rows (rowIndex >= 14)
-            if ((key === '' || key === '__4' || key === '__5' || key === '__8') && row >= 14) { // Added __8 for 납기
-                className = 'text-center-input';
-            } else if ((key === '__6' || key === '__7') && row >= 14) { // For 단가 and 금액 in item table
-                className = 'text-right-input';
-            }
-            return `<input type="text" data-row="${row}" data-key="${key}" value="${escapedValue}" placeholder="${placeholder}" class="${className}">`;
-        };
-        
-        const createTextarea = (row, key, value) => {
-            // Ensure value is a string and escape for HTML content
-            const escapedValue = String(value || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;'); // Corrected: was >gt; 
-            return `<textarea data-row="${row}" data-key="${key}">${escapedValue}</textarea>`;
-        };
-
-        // Header
-        html += `<h1><input type="text" data-row="0" data-key="__1" value="${data[0]['__1']}" style="text-align:center; font-size:32px; border:none;"></h1>`;
-        
-        html += `<div class="quote-header">`;
-        html += `<div class="quote-no-date">
-                    <p>${createInput(4, '', data[4][''])}</p>
-                    <p>${createInput(4, '__6', data[4]['__6'])}</p>
-                 </div>`;
-        html += `<div class="parties">
-                    <div class="to-party">
-                        <h3>To</h3>
-                        <p>${createInput(5, '', data[5][''].replace('To ', ''))}</p>
-                        <p>Attn: ${createInput(6, '', data[6][''].replace('Attn ', ''))}</p>
-                        <p>Tel: ${createInput(7, '', data[7][''].replace('Tel ', ''))}</p>
-                        <p>e-mail: ${createInput(8, '__1', data[8]['__1'])}</p>
-                    </div>
-                    <div class="from-party">
-                        <h3>From</h3>
-                        <p>${createInput(5, '__6', data[5]['__6'])}</p>
-                        <p>Name: ${createInput(6, '__6', data[6]['__6'])}</p>
-                        <p>Tel: ${createInput(7, '__6', data[7]['__6'])}</p>
-                        <p>e-mail: ${createInput(8, '__6', data[8]['__6'])}</p>
-                    </div>
-                 </div></div>`;
-
-        // Greetings
-        html += `<div class="quote-greeting">
-                    <p>${createInput(10, '', data[10][''])}</p>
-                    <p>${createInput(11, '', data[11][''])}</p>
-                 </div>`;
-
-        // Items table
-        const itemHeaders = data[13];
-        const excludedKeys = ['__1', '__3']; // Keys for '품목' and '상태'
-        const headerKeys = Object.keys(itemHeaders).filter(k => itemHeaders[k] && !excludedKeys.includes(k));
-        html += `<div class="quote-body"><table><thead><tr>`;
-
-        const columnWidths = {
-            '': '7%',     // No.
-            '__2': '43%', // 규격
-            '__4': '7%',  // 수량
-            '__5': '7%',  // 단위
-            '__6': '12%', // 단가
-            '__7': '12%', // 금액
-            '__8': '12%'  // 납기
-        };
-
-        headerKeys.forEach(key => {
-            const thStyle = `width: ${columnWidths[key] || 'auto'};`; // Use 'auto' for keys not in map
-            html += `<th style="${thStyle}">${itemHeaders[key]}</th>`;
-        });
-        html += `</tr></thead><tbody>`;
-
-        for (let i = 0; i < 10; i++) {
-            const rowIndex = 14 + i;
-            html += `<tr>`;
-            headerKeys.forEach(key => {
-                const value = (data[rowIndex] && data[rowIndex][key]) ? data[rowIndex][key] : '';
-                // Apply formatting for 단가 and 금액 columns
-                if (key === '__6' || key === '__7') { // 단가 or 금액
-                    html += `<td>${createInput(rowIndex, key, formatNumber(value))}</td>`;
+                if (nextRow) {
+                    // Focus on the item name input of the next row
+                    nextRow.querySelector('.item-name').focus();
                 } else {
-                    html += `<td>${createInput(rowIndex, key, value)}</td>`;
-                }
-            });
-            html += `</tr>`;
-        }
-        html += `</tbody>`;
-
-        // Footer (Total)
-        html += `<tfoot><tr>`;
-        html += `<td colspan="3" style="text-align:right; border:none;"></td>`;
-        html += `<td>합계금액</td>`; // bottom of "단위" column
-        html += `<td colspan="2">${createInput(34, '__7', data[34]['__7'])}</td>`; // bottom of "금액" column, now spans "단가" and "금액"
-        html += `<td style="border:none;"></td>`; // bottom of "납기" column
-        html += `</tr></tfoot></table></div>`;
-
-        // Terms and Remarks
-        html += `<div class="quote-footer">
-                    <div class="terms">
-                        <h3>계약 및 지불조건</h3>
-                        ${createTextarea(35, '', data[35][''])}
-                    </div>
-                    <div class="remarks">
-                        <h3>참고사항</h3>
-                        ${createTextarea(35, '__5', data[35]['__5'])}
-                    </div>
-                 </div>`;
-        
-        // Address
-        html += `<div class="quote-address"><p>${createInput(40, '', data[40][''])}</p></div>`;
-
-        quoteEditor.innerHTML = html;
-    }
-
-    function setupCalculations() {
-        const itemRows = quoteEditor.querySelectorAll('tbody tr');
-
-        itemRows.forEach(row => {
-            const quantityInput = row.querySelector('input[data-key="__4"]'); // 수량
-            const unitPriceInput = row.querySelector('input[data-key="__6"]'); // 단가
-            const amountInput = row.querySelector('input[data-key="__7"]'); // 금액
-
-            if (quantityInput && unitPriceInput && amountInput) {
-                const calculateAmount = () => {
-                    const quantity = parseNumber(quantityInput.value);
-                    const unitPrice = parseNumber(unitPriceInput.value);
-                    const amount = quantity * unitPrice;
-                    amountInput.value = formatNumber(amount);
-                };
-
-                quantityInput.addEventListener('input', calculateAmount);
-                unitPriceInput.addEventListener('input', calculateAmount);
-
-                // Reformat unit price on input change
-                unitPriceInput.addEventListener('input', () => {
-                    unitPriceInput.value = formatNumber(parseNumber(unitPriceInput.value));
-                });
-
-                // Add Enter key functionality to move focus
-                unitPriceInput.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter') {
-                        event.preventDefault(); // Prevent default Enter behavior
-
-                        // Find all editable inputs on the page
-                        const allInputs = Array.from(quoteEditor.querySelectorAll('input[data-row], textarea[data-row]'));
-                        const currentIndex = allInputs.indexOf(unitPriceInput);
-
-                        if (currentIndex > -1 && currentIndex < allInputs.length - 1) {
-                            allInputs[currentIndex + 1].focus(); // Move focus to the next input
-                        }
+                    // If it's the last row, add a new item and focus on its item name input
+                    addItemBtn.click(); // Programmatically click the add item button
+                    // After addItem, the new row will be the last one
+                    const newAddedRow = itemTableBody.lastElementChild;
+                    if (newAddedRow) {
+                        newAddedRow.querySelector('.item-name').focus();
                     }
-                });
-
-                // Initial calculation for existing values
-                calculateAmount();
-            }
-        });
-    }
-
-    saveButton.addEventListener('click', () => {
-        if (!originalData) return;
-
-        const updatedData = JSON.parse(JSON.stringify(originalData));
-
-        const inputs = quoteEditor.querySelectorAll('input[data-row], textarea[data-row]');
-        inputs.forEach(input => {
-            const row = parseInt(input.dataset.row, 10);
-            const key = input.dataset.key;
-            
-            // Special handling for fields where I removed a prefix
-            if (row === 5 && key === '') {
-                updatedData[row][key] = 'To ' + input.value;
-            } else if (row === 6 && key === '') {
-                updatedData[row][key] = 'Attn ' + input.value;
-            } else if (row === 7 && key === '') {
-                updatedData[row][key] = 'Tel ' + input.value;
-            } else {
-                // For numbers, store the raw number without commas
-                if (key === '__4' || key === '__6' || key === '__7') { // 수량, 단가, 금액
-                    updatedData[row][key] = parseNumber(input.value);
-                } else {
-                    updatedData[row][key] = input.value;
                 }
             }
         });
 
-        const jsonString = JSON.stringify(updatedData, null, 2);
+        deleteButton.addEventListener('click', () => deleteItem(newRow));
 
-        const outputContainer = document.getElementById('output-container');
-        const jsonOutput = document.getElementById('json-output');
-        const downloadLink = document.getElementById('download-link');
+        updateRowNumbers();
+        calculateRowAmount(newRow); // Calculate initial amount for the new row
+    }
 
-        jsonOutput.textContent = jsonString;
+    // Function to delete an item row
+    function deleteItem(row) {
+        row.remove();
+        updateRowNumbers();
+        calculateTotal();
+    }
 
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
+    // Function to calculate amount for a single row
+    function calculateRowAmount(row) {
+        const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+        // Remove commas before parsing unit price
+        const unitPrice = parseFloat(row.querySelector('.item-unit-price').value.replace(/,/g, '')) || 0;
+        const amount = quantity * unitPrice;
+        row.querySelector('.item-amount').textContent = formatNumberWithCommas(amount);
+        calculateTotal();
+    }
 
-        downloadLink.href = url;
-        downloadLink.download = '견적서_수정.json';
-        
-        outputContainer.style.display = 'block';
-        downloadLink.style.display = 'block';
+    // Function to calculate total amount
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.item-amount').forEach(amountCell => {
+            // Remove non-numeric characters (like commas) before parsing
+            total += parseFloat(amountCell.textContent.replace(/,/g, '')) || 0;
+        });
+        totalAmountSpan.textContent = formatNumberWithCommas(total);
+    }
+
+    // Function to update row numbers
+    function updateRowNumbers() {
+        const rows = itemTableBody.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+            row.querySelector('td:first-child').textContent = index + 1;
+        });
+        itemCounter = rows.length; // Keep itemCounter in sync with actual rows
+    }
+
+    // Event listener for Add Item button
+    addItemBtn.addEventListener('click', addItem);
+
+    // Event listener for Capture button
+    captureBtn.addEventListener('click', () => {
+        // Temporarily hide buttons that shouldn't be in the screenshot
+        addItemBtn.style.display = 'none';
+        document.querySelectorAll('.delete-item-btn').forEach(btn => btn.style.display = 'none');
+        captureBtn.style.display = 'none';
+
+        html2canvas(quoteFormContainer, {
+            scale: 2, // Increase scale for better quality
+            useCORS: true // Important for images if any
+        }).then(canvas => {
+            // Re-show buttons
+            addItemBtn.style.display = '';
+            document.querySelectorAll('.delete-item-btn').forEach(btn => btn.style.display = '');
+            captureBtn.style.display = '';
+
+            const link = document.createElement('a');
+            link.download = '견적서.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
     });
+
+    // Add an initial item row when the page loads
+    addItem();
 });

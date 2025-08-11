@@ -1,177 +1,95 @@
 body {
-    font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
-    background-color: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
+    background-color: #f8f9fa;
 }
 
 .container {
-    width: 840px;
-    background: #fff;
-    padding: 40px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    background-color: #ffffff;
+    padding: 30px;
     border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
-#quote {
-    width: 100%;
+h2 {
+    color: #343a40;
 }
 
-h1 {
+.card-title {
+    color: #495057;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.table thead th {
+    background-color: #e9ecef;
+}
+
+/* Center-align No. column */
+.table th:nth-child(1),
+.table td:nth-child(1) {
     text-align: center;
-    color: #333;
-    font-size: 32px;
-    margin-bottom: 30px;
 }
 
-.quote-header {
-    margin-bottom: 20px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 20px;
+/* Center-align headers for Quantity, Unit Price, and Amount */
+.table th:nth-child(3),
+.table th:nth-child(4),
+.table th:nth-child(5) {
+    text-align: center;
 }
 
-.quote-no-date {
+/* Align input forms and amount text */
+.table td:nth-child(3) input { /* Quantity input */
+    text-align: center;
+}
+
+.table td:nth-child(4) input { /* Unit Price input */
     text-align: right;
-    margin-bottom: 20px;
-    color: #555;
 }
 
-.parties {
-    display: flex;
-    justify-content: space-between;
+.table td:nth-child(5) { /* Amount text */
+    text-align: right;
 }
 
-.to-party, .from-party {
-    width: 48%;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+/* Made by signature styling */
+#made-by-signature {
+    font-size: 0.8em;
+    color: #6c757d; /* Bootstrap muted text color */
+    text-align: left; /* Ensure it's left-aligned */
+    margin-top: 20px; /* Add some space from the content above */
+    padding-left: 15px; /* Align with container's padding */
 }
 
-.to-party h3, .from-party h3 {
-    margin-top: 0;
-    color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-}
+/* Adjust input widths in table for better mobile view */
+@media (max-width: 767.98px) {
+    .table th, .table td {
+        font-size: 0.85em;
+        padding: 0.5em;
+    }
 
-.quote-greeting {
-    margin: 20px 0;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-}
+    .table input[type="text"], .table input[type="number"] {
+        width: 100%;
+        min-width: 60px; /* Ensure inputs are not too small */
+    }
 
-.quote-body table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    table-layout: fixed; /* Add this line */
-}
+    .table th:nth-child(1), .table td:nth-child(1) { /* No. column */
+        width: 40px;
+    }
 
-.quote-body th, .quote-body td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
+    .table th:nth-child(3), .table td:nth-child(3) { /* Quantity */
+        width: 80px;
+    }
 
-.quote-body th {
-    background-color: #f2f2f2;
-}
+    .table th:nth-child(4), .table td:nth-child(4) { /* Unit Price */
+        width: 120px;
+    }
 
-.quote-body tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
+    .table th:nth-child(5), .table td:nth-child(5) { /* Amount */
+        width: 120px;
+    }
 
-.quote-body tfoot td {
-    font-weight: bold;
-    background-color: #f2f2f2;
-}
-
-.quote-footer {
-    margin-top: 30px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-}
-
-.terms, .remarks {
-    width: 48%;
-}
-
-.terms h3, .remarks h3 {
-    margin-top: 0;
-    font-size: 16px;
-    color: #333;
-}
-
-.quote-address {
-    margin-top: 30px;
-    text-align: center;
-    font-size: 12px;
-    color: #777;
-}
-
-/* Appended styles for editor */
-input[type="text"], textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Important */
-}
-
-textarea {
-    height: 100px;
-    resize: vertical;
-}
-
-.quote-body td {
-    padding: 5px;
-}
-
-.actions {
-    text-align: center;
-    margin-top: 30px;
-}
-
-#save-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
-#output-container {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #272822;
-    color: #f8f8f2;
-    border-radius: 5px;
-}
-
-#json-output {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-#download-link {
-    display: block;
-    margin-bottom: 10px;
-    color: #66d9ef;
-}
-
-.text-center-input {
-    text-align: center !important;
-}
-
-.text-right-input {
-    text-align: right !important;
+    .table th:nth-child(6), .table td:nth-child(6) { /* Delete button */
+        width: 60px;
+    }
 }
